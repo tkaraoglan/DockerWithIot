@@ -1,0 +1,169 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "80a374c0bda576b1",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "influxdb",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://influxdb:8086",
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "71ecb45c4660217f",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 200,
+        "wires": [
+            [
+                "f36c9e9495da7f89"
+            ]
+        ]
+    },
+    {
+        "id": "0578531ff0b801f5",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "f36c9e9495da7f89",
+        "type": "http request",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "dev1:5000",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "x": 490,
+        "y": 200,
+        "wires": [
+            [
+                "0578531ff0b801f5",
+                "9f2697cd5a697a59",
+                "6b9b69d21627a89d"
+            ]
+        ]
+    },
+    {
+        "id": "bdb020438a3053ef",
+        "type": "influxdb out",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "80a374c0bda576b1",
+        "name": "influxdb",
+        "measurement": "data",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "krgln",
+        "bucket": "krglnbucket",
+        "x": 780,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "9f2697cd5a697a59",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "msg.payload = [\n    [{\n        temp: msg.payload.data.temp,\n    },\n    {\n        device: msg.payload.data.device,\n        container: msg.payload.data.name\n    }],\n];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 300,
+        "wires": [
+            [
+                "0578531ff0b801f5",
+                "bdb020438a3053ef"
+            ]
+        ]
+    },
+    {
+        "id": "173a2b25cbc12e40",
+        "type": "http request",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://postgrest:3000/temperature_data",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "x": 790,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6b9b69d21627a89d",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "msg.payload = [\n\t\t{\n\t\t    \"device\": msg.payload.data.device,\n\t\t    \"container\": msg.payload.data.container,\n\t\t    \"temperature\": msg.payload.data.temp\n\t\t}\n];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 80,
+        "wires": [
+            [
+                "173a2b25cbc12e40",
+                "0578531ff0b801f5"
+            ]
+        ]
+    }
+]

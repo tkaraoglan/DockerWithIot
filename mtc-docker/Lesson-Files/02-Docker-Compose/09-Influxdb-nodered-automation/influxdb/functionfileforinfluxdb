@@ -1,0 +1,10 @@
+msg.payload = [
+    [{
+        temp: msg.payload.data.temp,
+    },
+    {
+        device: msg.payload.data.device,
+        container: msg.payload.data.name
+    }],
+];
+return msg;
